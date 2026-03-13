@@ -12,9 +12,12 @@ struct Node {
 	Node* parent = nullptr;
 };
 
+void printTree(Node* root, int depth);
 void addNode(Node* &root, Node* &newNode);
 bool doesExist(Node* current, int value);
-void deleteNode(Node* &current, int value);
+void deleteNode(Node* current, int value);
+void eraseNodeFromParent(Node* current);
+void replaceNode(Node* current, Node* replacingNode);
 Node* returnSuccessor(Node* original);
 
 
@@ -36,7 +39,7 @@ int main(){
 			cout << "What value do you want to delete?: ";
 			cin >> value;
 			if (doesExist(root, value)){
-				cout << "somethin" << endl;
+				deleteNode(root, value);
 			}
 			else{
 				cout << "Cannot delete value that does not exist" << endl;
@@ -79,7 +82,7 @@ int main(){
 
 		}
 		else if (command == "PRINT"){
-			cout << root->data << " " << root->left->data << " " << root->right->data << endl;
+			printTree(root, 0);
 		}
 		else if (command == "SEARCH"){
 			//Searches if provided value in list
@@ -103,6 +106,22 @@ int main(){
 	}
 
 	return 0;
+}
+void printTree(Node* current, int depth){
+	Node* left = current->left;
+	Node* right = current->right;
+	if (right != nullptr){
+		printTree(right,depth+1);
+	}
+	for (int i = 0;i< depth;i++){
+		cout << "\t";
+	}
+	if (current != nullptr){
+		cout << current->data << endl;
+	}
+	if (left != nullptr){
+		printTree(left, depth+1);
+	}
 }
 
 void addNode(Node* &root, Node* &newNode){
@@ -155,9 +174,40 @@ bool doesExist(Node* current, int value){
 	}
 }
 
-void deleteNode(Node* &current, int value){
+void deleteNode(Node* current, int value){
 	if (current->data == value){
-		//delete
+		//No child case
+		if (current->left == nullptr && current->right == nullptr){
+			eraseNodeFromParent(current);
+		}
+		//One child cases
+		else if (current->right == nullptr){
+			Node* newCurrent = current->left;
+			newCurrent->parent = current->parent;
+			replaceNode(current, newCurrent);
+		}
+		else if (current->left == nullptr){
+			Node* newCurrent = current->right;
+			newCurrent->parent = current->parent;
+			replaceNode(current, newCurrent);
+		}
+		//Two child case
+		else{
+			Node* newCurrent = returnSuccessor(current);
+			eraseNodeFromParent(newCurrent);
+			if (newCurrent->right != nullptr){
+				replaceNode(newCurrent, newCurrent->right);
+				newCurrent->right = nullptr;
+				newCurrent->right->parent = newCurrent->parent;
+			}
+			newCurrent->parent = current->parent;
+			newCurrent->left = current->left;
+			if (newCurrent != current->right){
+				newCurrent->right = current->right;
+			}
+			replaceNode(current,newCurrent);
+		}
+		delete current;
 	}
 	else{
 		if (value <= current->data){
@@ -168,6 +218,22 @@ void deleteNode(Node* &current, int value){
 		}
 	}
 	
+}
+void eraseNodeFromParent(Node* current){
+	if (current->data <= current->parent->data){
+		current->parent->left = nullptr;
+	}
+	else{
+		current->parent->right = nullptr;
+	}
+}
+void replaceNode(Node* current, Node* replacingNode){
+	if (current->data <= current->parent->data){
+		current->parent->left = replacingNode;
+	}
+	else{
+		current->parent->right = replacingNode;
+	}
 }
 Node* returnSuccessor(Node* original){
 	Node* current = original->right;
