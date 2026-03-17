@@ -14,7 +14,7 @@ struct Node {
 
 void printTree(Node* root, int depth);
 void addNode(Node* &root, Node* &newNode);
-bool doesExist(Node* current, int value);
+Node* doesExist(Node* current, int value);
 void deleteNode(Node* current, int value);
 void eraseNodeFromParent(Node* current);
 void replaceNode(Node* current, Node* replacingNode);
@@ -152,14 +152,14 @@ void addNode(Node* &root, Node* &newNode){
 		}
 	}
 }
-bool doesExist(Node* current, int value){
+Node* doesExist(Node* current, int value){
 	if (current->data == value){
-		return true;
+		return current;
 	}
 	else{
 		if (value < current->data){
 			if (current->left == nullptr){
-				return false;
+				return nullptr;
 			}
 			else{
 				return doesExist(current->left, value);
@@ -167,7 +167,7 @@ bool doesExist(Node* current, int value){
 		}
 		else{
 			if (current->right == nullptr){
-				return false;
+				return nullptr;
 			}
 			else{
 				return doesExist(current->right, value);
