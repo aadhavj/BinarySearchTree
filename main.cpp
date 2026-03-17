@@ -1,10 +1,11 @@
+//Import modules
 #include <iostream>
 #include <cstring>
 #include <string>
 #include <fstream>
 using namespace std;
 
-
+//Node struct
 struct Node {
 	int data;
 	Node* left = nullptr;
@@ -12,6 +13,7 @@ struct Node {
 	Node* parent = nullptr;
 };
 
+//Function prototypes
 void printTree(Node* root, int depth);
 void addNode(Node* &root, Node* &newNode);
 Node* doesExist(Node* current, int value);
@@ -27,13 +29,13 @@ int main(){
 	Node* root = nullptr;
 	bool runProgram = true;
 
-
+	//Program runs
 	while (runProgram){
 		cout << "\nEnter Command(DELETE, SEARCH, ADD, PRINT, ADDF, QUIT): ";
 		cin >> command;
 		
 		//Command recognition
-		if (command == "DELETE"){
+		if (command == "DELETE"){ //Deletes node objects
 			int value;
 			cout << "What value do you want to delete?: ";
 			cin >> value;
@@ -44,7 +46,7 @@ int main(){
 				cout << "Cannot delete value that does not exist" << endl;
 			}
 		}
-		else if (command == "ADD"){
+		else if (command == "ADD"){ //Adds node objects
 
 			//Get value
 			int value;
@@ -58,7 +60,7 @@ int main(){
 			//Push to tree
 			addNode(root, addMe);
 		}
-		else if (command == "ADDF"){
+		else if (command == "ADDF"){ //Adds file nodes to tree
 			//Adds file
 			string fileName;
 			cout << "Please enter filename: " << endl;
@@ -80,12 +82,12 @@ int main(){
 			}
 
 		}
-		else if (command == "PRINT"){
+		else if (command == "PRINT"){ //Prints our tree
 			if (root != nullptr){
 				printTree(root, 0);
 			}
 		}
-		else if (command == "SEARCH"){
+		else if (command == "SEARCH"){ //Searches for node in tree
 			//Searches if provided value in list
 			int value;
 			cout << "Value you are searching for?: " << endl;
@@ -108,6 +110,7 @@ int main(){
 
 	return 0;
 }
+//Prints the tree
 void printTree(Node* current, int depth){
 	Node* left = current->left;
 	Node* right = current->right;
@@ -125,6 +128,7 @@ void printTree(Node* current, int depth){
 	}
 }
 
+//Adds node to tree
 void addNode(Node* &root, Node* &newNode){
 	if (root == nullptr){
 		root = newNode;
@@ -151,6 +155,8 @@ void addNode(Node* &root, Node* &newNode){
 		}
 	}
 }
+
+//Returns if a node of given value exists
 Node* doesExist(Node* current, int value){
 	if (current->data == value){
 		return current;
@@ -175,6 +181,7 @@ Node* doesExist(Node* current, int value){
 	}
 }
 
+//Deletes a node from the tree
 void deleteNode(Node* &root, int value){
 	Node* deleteMe = doesExist(root,value);
 	if (deleteMe != nullptr){
@@ -247,6 +254,7 @@ void deleteNode(Node* &root, int value){
 		delete deleteMe;
 	}
 }
+//Makes it so replacing Node is seen as child of the current nodes parents
 void replaceNode(Node* current, Node* replacingNode){
 	if (current->data <= current->parent->data){
 		current->parent->left = replacingNode;
@@ -255,6 +263,7 @@ void replaceNode(Node* current, Node* replacingNode){
 		current->parent->right = replacingNode;
 	}
 }
+//Gets successor
 Node* returnSuccessor(Node* original){
 	Node* current = original->right;
 	while (current->left != nullptr){
