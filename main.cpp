@@ -82,7 +82,9 @@ int main(){
 
 		}
 		else if (command == "PRINT"){
-			printTree(root, 0);
+			if (root != nullptr){
+				printTree(root, 0);
+			}
 		}
 		else if (command == "SEARCH"){
 			//Searches if provided value in list
@@ -178,7 +180,12 @@ void deleteNode(Node* current, int value){
 	if (current->data == value){
 		//No child case
 		if (current->left == nullptr && current->right == nullptr){
-			eraseNodeFromParent(current);
+			if (current->parent != nullptr){
+				eraseNodeFromParent(current);
+			}
+			else{
+				current = nullptr;
+			}
 		}
 		//One child cases
 		else if (current->right == nullptr){
