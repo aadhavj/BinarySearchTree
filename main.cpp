@@ -193,21 +193,35 @@ void deleteNode(Node* current, int value){
 		}
 		//Two child case
 		else{
+			//Get successor
 			Node* newCurrent = returnSuccessor(current);
+
+			//Set successor's parent to not recognize child
 			eraseNodeFromParent(newCurrent);
+
+			//If there are right nodes of successor, make the right node take successor's place
 			if (newCurrent->right != nullptr){
 				replaceNode(newCurrent, newCurrent->right);
-				newCurrent->right = nullptr;
 				newCurrent->right->parent = newCurrent->parent;
+				newCurrent->right = nullptr;
 			}
+
+			//Put successor into place of current in tree
 			newCurrent->parent = current->parent;
 			newCurrent->left = current->left;
-			if (newCurrent != current->right){
+			newCurrent->left->parent = newCurrent;
+			if (current->right != nullptr){
 				newCurrent->right = current->right;
+				newCurrent->right->parent = newCurrent;
+			}
+			else{
+				//cout << "successor is direct right of deleted value.";
+				newCurrent->right = nullptr;
+				//cout << newCurrent->parent->data; //<< " " << newCurrent->left->data << " " << newCurrent->right->data << endl;
 			}
 			replaceNode(current,newCurrent);
 		}
-		delete current;
+		//delete current;
 	}
 	else{
 		if (value <= current->data){
