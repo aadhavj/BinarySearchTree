@@ -15,8 +15,7 @@ struct Node {
 void printTree(Node* root, int depth);
 void addNode(Node* &root, Node* &newNode);
 Node* doesExist(Node* current, int value);
-void deleteNode(Node* current, int value);
-void eraseNodeFromParent(Node* current);
+void deleteNode(Node* &root, int value);
 void replaceNode(Node* current, Node* replacingNode);
 Node* returnSuccessor(Node* original);
 
@@ -38,7 +37,7 @@ int main(){
 			int value;
 			cout << "What value do you want to delete?: ";
 			cin >> value;
-			if (doesExist(root, value)){
+			if (doesExist(root, value) != nullptr){
 				deleteNode(root, value);
 			}
 			else{
@@ -91,7 +90,7 @@ int main(){
 			int value;
 			cout << "Value you are searching for?: " << endl;
 			cin >> value;
-			if (doesExist(root, value)){
+			if (root != nullptr && doesExist(root, value) != nullptr){
 				cout << "Node with that value exists." << endl;
 			}
 			else{
@@ -176,76 +175,76 @@ Node* doesExist(Node* current, int value){
 	}
 }
 
-void deleteNode(Node* current, int value){
-	if (current->data == value){
+void deleteNode(Node* &root, int value){
+	Node* deleteMe = doesExist(root,value);
+	if (deleteMe != nullptr){
 		//No child case
-		if (current->left == nullptr && current->right == nullptr){
-			if (current->parent != nullptr){
-				eraseNodeFromParent(current);
+		if (deleteMe->left == nullptr && deleteMe->right == nullptr){
+			if (deleteMe->parent != nullptr){
+				replaceNode(deleteMe, nullptr);
 			}
 			else{
-				current = nullptr;
+				root = nullptr;
 			}
 		}
 		//One child cases
-		else if (current->right == nullptr){
-			Node* newCurrent = current->left;
-			newCurrent->parent = current->parent;
-			replaceNode(current, newCurrent);
+		else if (deleteMe->right == nullptr){
+			Node* successor = deleteMe->left;
+			successor->parent = deleteMe->parent;
+			if (successor->parent != nullptr){
+				replaceNode(deleteMe, successor);
+			}
+			else{
+				root = successor;
+			}
 		}
-		else if (current->left == nullptr){
-			Node* newCurrent = current->right;
-			newCurrent->parent = current->parent;
-			replaceNode(current, newCurrent);
+		else if (deleteMe->left == nullptr){
+			Node* successor = deleteMe->right;
+			successor->parent = deleteMe->parent;
+			if (successor->parent != nullptr){
+				replaceNode(deleteMe, successor);
+			}
+			else{
+				root = successor;
+			}
 		}
 		//Two child case
 		else{
 			//Get successor
-			Node* newCurrent = returnSuccessor(current);
+			Node* successor = returnSuccessor(deleteMe);
 
 			//Set successor's parent to not recognize child
-			eraseNodeFromParent(newCurrent);
+			//eraseNodeFromParent(successor);
+			replaceNode(successor, nullptr);
 
 			//If there are right nodes of successor, make the right node take successor's place
-			if (newCurrent->right != nullptr){
-				replaceNode(newCurrent, newCurrent->right);
-				newCurrent->right->parent = newCurrent->parent;
-				newCurrent->right = nullptr;
+			if (successor->right != nullptr){
+				replaceNode(successor, successor->right);
+				successor->right->parent = successor->parent;
+				successor->right = nullptr;
 			}
 
 			//Put successor into place of current in tree
-			newCurrent->parent = current->parent;
-			newCurrent->left = current->left;
-			newCurrent->left->parent = newCurrent;
-			if (current->right != nullptr){
-				newCurrent->right = current->right;
-				newCurrent->right->parent = newCurrent;
+			successor->parent = deleteMe->parent;
+			successor->left = deleteMe->left;
+			successor->left->parent = successor;
+			if (deleteMe->right != nullptr){
+				successor->right = deleteMe->right;
+				successor->right->parent = successor;
 			}
 			else{
 				//cout << "successor is direct right of deleted value.";
-				newCurrent->right = nullptr;
+				successor->right = nullptr;
 				//cout << newCurrent->parent->data; //<< " " << newCurrent->left->data << " " << newCurrent->right->data << endl;
 			}
-			replaceNode(current,newCurrent);
+			if (successor->parent != nullptr){
+				replaceNode(deleteMe,successor);
+			}
+			else{
+				root = successor;
+			}
 		}
-		//delete current;
-	}
-	else{
-		if (value <= current->data){
-			deleteNode(current->left, value);
-		}
-		else{
-			deleteNode(current->right, value);
-		}
-	}
-	
-}
-void eraseNodeFromParent(Node* current){
-	if (current->data <= current->parent->data){
-		current->parent->left = nullptr;
-	}
-	else{
-		current->parent->right = nullptr;
+		delete deleteMe;
 	}
 }
 void replaceNode(Node* current, Node* replacingNode){
